@@ -81,7 +81,7 @@ docker run --privileged --gpus all -it --rm \
     --role head \
     --host-ip 192.168.177.11 \
     --eth-if enp1s0f1np1 \
-    --ib-if rocep1s0f1 
+    --ib-if rocep1s0f1,roceP2p1s0f1 
 ```
 
 **On worker node**
@@ -96,7 +96,7 @@ docker run --privileged --gpus all -it --rm \
     --role node \
     --host-ip 192.168.177.12 \
     --eth-if enp1s0f1np1 \
-    --ib-if rocep1s0f1 \
+    --ib-if rocep1s0f1,roceP2p1s0f1 \
     --head-ip 192.168.177.11
 ```
 
@@ -128,7 +128,7 @@ Normally you would start it with the container like in the example above, but yo
 | `-r` | `--role` | Role of the machine: `head` or `node`. | **Yes** |
 | `-h` | `--host-ip` | The IP address of **this** specific machine (for ConnectX port, e.g. `enp1s0f1np1`). | **Yes** |
 | `-e` | `--eth-if` | ConnectX 7 Ethernet interface name (e.g., `enp1s0f1np1`). | **Yes** |
-| `-i` | `--ib-if` | ConnectX 7 InfiniBand interface name (e.g., `rocep1s0f1`). | **Yes** |
+| `-i` | `--ib-if` | ConnectX 7 InfiniBand interface name (e.g., `rocep1s0f1` - on Spark specifically you want to use both "twins": `rocep1s0f1,roceP2p1s0f1`). | **Yes** |
 | `-m` | `--head-ip` | The IP address of the **Head Node**. | Only if role is `node` |
 
 
@@ -142,7 +142,7 @@ roceP2p1s0f1 port 1 ==> enP2p1s0f1np1 (Up)
 ```
 
 Each physical port on Spark has two pairs of logical interfaces in Linux. 
-Current NVIDIA guidance recommends using only one of them, in this case it would be `enp1s0f1np1` for Ethernet and `rocep1s0f1` for IB.
+Current NVIDIA guidance recommends using only one of them, in this case it would be `enp1s0f1np1` for Ethernet, but use **both** `rocep1s0f1,roceP2p1s0f1` for IB.
 
 You need to make sure you allocate IP addresses to them (no need to allocate IP to their "twins").
 
@@ -153,7 +153,7 @@ You need to make sure you allocate IP addresses to them (no need to allocate IP 
   --role head \
   --host-ip 192.168.177.11 \
   --eth-if enp1s0f1np1 \
-  --ib-if rocep1s0f1
+  --ib-if rocep1s0f1,roceP2p1s0f1
 ```
 
 ### Example: Starting inside a Worker Node
@@ -163,7 +163,7 @@ You need to make sure you allocate IP addresses to them (no need to allocate IP 
   --role node \
   --host-ip 192.168.177.12 \
   --eth-if enp1s0f1np1 \
-  --ib-if rocep1s0f1 \
+  --ib-if rocep1s0f1,roceP2p1s0f1 \
   --head-ip 192.168.177.11
 ```
 
