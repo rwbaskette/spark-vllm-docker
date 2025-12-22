@@ -84,6 +84,12 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     uv pip install ${FLASHINFER_PRE} flashinfer-cubin --index-url https://flashinfer.ai/whl && \
     uv pip install ${FLASHINFER_PRE} flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu130 && \
     uv pip install apache-tvm-ffi nvidia-cudnn-frontend nvidia-cutlass-dsl nvidia-ml-py tabulate
+
+ARG PRE_TRANSFORMERS=0
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
+    if [ "$PRE_TRANSFORMERS" = "1" ]; then \
+        uv pip install -U transformers --pre; \
+    fi
 # =========================================================
 # STAGE 2: Triton Builder (Compiles Triton independently)
 # =========================================================
@@ -153,12 +159,18 @@ RUN --mount=type=cache,id=repo-cache,target=/repo-cache \
 
 WORKDIR $VLLM_BASE_DIR/vllm
 
+ARG PRE_TRANSFORMERS=0
+
 # Prepare build requirements
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     python3 use_existing_torch.py && \
     sed -i "/flashinfer/d" requirements/cuda.txt && \
     sed -i '/^triton\b/d' requirements/test.txt && \
     sed -i '/^fastsafetensors\b/d' requirements/test.txt && \
+    if [ "$PRE_TRANSFORMERS" = "1" ]; then \
+        sed -i '/^transformers\b/d' requirements/common.txt; \
+        sed -i '/^transformers\b/d' requirements/test.txt; \
+    fi && \
     uv pip install -r requirements/build.txt
 
 # Apply Patches

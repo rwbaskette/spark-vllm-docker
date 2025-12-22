@@ -17,6 +17,7 @@ TMP_IMAGE=""
 PARALLEL_COPY=false
 USE_WHEELS_MODE=""
 PRE_FLASHINFER=false
+PRE_TRANSFORMERS=false
 
 cleanup() {
     if [ -n "$TMP_IMAGE" ] && [ -f "$TMP_IMAGE" ]; then
@@ -71,6 +72,7 @@ usage() {
     echo "  -u, --user <user>         : Username for ssh command (default: \$USER)"
     echo "  --use-wheels [mode]       : Use prebuilt vLLM wheels. Mode can be 'nightly' (default) or 'release'."
     echo "  --pre-flashinfer          : Use pre-release versions of FlashInfer"
+    echo "  --pre-tf, --pre-transformers : Install transformers 5.0.0rc0 or higher"
     echo "  --no-build                : Skip building, only copy image (requires --copy-to)"
     echo "  -h, --help                : Show this help message"
     exit 1
@@ -132,6 +134,7 @@ while [[ "$#" -gt 0 ]]; do
             fi
             ;;
         --pre-flashinfer) PRE_FLASHINFER=true ;;
+        --pre-tf|--pre-transformers) PRE_TRANSFORMERS=true ;;
         --no-build) NO_BUILD=true ;;
         -h|--help) usage ;;
         *) echo "Unknown parameter passed: $1"; usage ;;
@@ -183,6 +186,11 @@ if [ "$NO_BUILD" = false ]; then
     if [ "$PRE_FLASHINFER" = true ]; then
         echo "Using pre-release FlashInfer..."
         CMD+=("--build-arg" "FLASHINFER_PRE=--pre")
+    fi
+
+    if [ "$PRE_TRANSFORMERS" = true ]; then
+        echo "Using transformers>=5.0.0..."
+        CMD+=("--build-arg" "PRE_TRANSFORMERS=1")
     fi
 
     # Add build context

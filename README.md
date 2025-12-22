@@ -116,8 +116,9 @@ For periodic maintenance, I recommend using a filter: `docker builder prune --fi
 
 ### 2025-12-21
 
-Pre-built wheels now support release versions. Use with `--use-wheels release`.
-Using nightly wheels or building from source is recommended for better performance.
+- Added `--pre-tf` / `--pre-transformers` flag to `build-and-copy.sh` to install pre-release transformers (5.0.0rc or higher). Use it if you need to run GLM 4.6 Air or any other model that requires transformers 5.0. It may cause issues with other models, so you may want to stick to the release version for everything else.
+- Pre-built wheels now support release versions. Use with `--use-wheels release`.
+- Using nightly wheels or building from source is recommended for better performance.
 
 ### 2025-12-20
 
@@ -194,6 +195,7 @@ Using a provided build script is recommended, but if you want to build using `do
 | `VLLM_REF` | `main` | vLLM commit SHA, branch, or tag to build. |
 | `BUILD_JOBS` | `16` | Number of parallel build jobs (default: 16). |
 | `FLASHINFER_PRE` | `""` | Set to `--pre` to use pre-release versions of FlashInfer. |
+| `PRE_TRANSFORMERS` | `0` | Set to `1` to install pre-release transformers (5.0.0rc or higher). |
 
 ### Building Manually using Wheels
 
@@ -211,6 +213,7 @@ Supported build arguments for `Dockerfile.wheels`:
 | `CACHEBUST_VLLM` | `1` | Change this to force a re-download of vLLM wheels. |
 | `WHEELS_FROM_GITHUB_RELEASE` | `0` | Set to `1` to use GitHub release wheels instead of nightly wheels. |
 | `FLASHINFER_PRE` | `""` | Set to `--pre` to use pre-release versions of FlashInfer. |
+| `PRE_TRANSFORMERS` | `0` | Set to `1` to install pre-release transformers (5.0.0rc or higher). |
 
 ### Using the Build Script (Recommended)
 
@@ -301,6 +304,7 @@ Using a different username:
 | `--rebuild-vllm` | Force rebuild vLLM source only (sets CACHEBUST_VLLM) |
 | `--triton-ref <ref>` | Triton commit SHA, branch or tag (default: 'v3.5.1') |
 | `--vllm-ref <ref>` | vLLM commit SHA, branch or tag (default: 'main') |
+| `--pre-tf` | Install pre-release transformers (5.0.0rc or higher). Alias: `--pre-transformers`. |
 | `--use-wheels [mode]` | Use pre-built vLLM wheels. Mode: `nightly` (default) or `release`. |
 | `--pre-flashinfer` | Use pre-release versions of FlashInfer. |
 | `-c, --copy-to <host[,host...] or host host...>` | Host(s) to copy the image to after building (space- or comma-separated list after the flag). |

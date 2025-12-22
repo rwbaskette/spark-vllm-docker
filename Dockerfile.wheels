@@ -77,6 +77,12 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     uv pip install ${FLASHINFER_PRE} flashinfer-cubin --index-url https://flashinfer.ai/whl && \
     uv pip install ${FLASHINFER_PRE} flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu130
 
+ARG PRE_TRANSFORMERS=0
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
+    if [ "$PRE_TRANSFORMERS" = "1" ]; then \
+        uv pip install -U transformers --pre; \
+    fi
+
 # Setup Env for Runtime
 ENV TORCH_CUDA_ARCH_LIST=12.1a
 ENV TRITON_PTXAS_PATH=/usr/local/cuda/bin/ptxas
