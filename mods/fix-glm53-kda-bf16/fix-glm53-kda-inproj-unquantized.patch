@@ -1,0 +1,21 @@
+--- kimi_gdn_linear_attn.py.orig
++++ kimi_gdn_linear_attn.py
+@@ -493,13 +493,17 @@
+         self.in_proj_qkvgfab = _KimiGDNMergedColumnParallelLinear(
+             self.hidden_size,
+             in_proj_output_sizes,
+             replicated_shard_id=4,
+             tp_size=self.tp_size,
+             bias=False,
+-            quant_config=self.quant_config,
++            # Weight-only NVFP4 checkpoint: the KDA projections ship as raw
++            # BF16 (quantization_config.ignore names this fused projection
++            # by its checkpoint-side name), so build it unquantized.
++            # [fix-glm53-kda-bf16]
++            quant_config=None,
+             prefix=f"{prefix}.in_proj_qkvgfab",
+         )
+         if self.in_proj_padding:
+             self.in_proj_qkvgfab.weight.data[-self.in_proj_padding :].zero_()
+ 
+         self.f_b_proj = ColumnParallelLinear(
